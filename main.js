@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 
 const canvas = document.querySelector('#c');
+
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
@@ -10,21 +11,33 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 1.6, 5); // eye height at ~1.6m
+camera.position.set(0, 1.6, 5);
 
-const renderer = new THREE.WebGLRenderer({
-  canvas,
-  antialias: true,
-  alpha: true,
-});
-renderer.setSize(window.innerWidth, window.innerHeight);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x000000, 0);
+
+const cubeLoader = new THREE.CubeTextureLoader();
+const skybox = cubeLoader.load(
+  [
+    'resources/images/skybox_right.jpeg',  // posX
+    'resources/images/skybox_left.jpeg',   // negX
+    'resources/images/skybox_top.jpeg',    // posY
+    'resources/images/skybox_bottom.jpeg', // negY
+    'resources/images/skybox_front.jpeg',  // posZ
+    'resources/images/skybox_back.jpeg',   // negZ
+  ],
+  () => { scene.background = skybox; },
+  undefined,
+  (err) => console.error('Skybox load error:', err)
+);
 
 const cube = new THREE.Mesh(
   new THREE.BoxGeometry(1, 1, 1),
   new THREE.MeshPhongMaterial({ color: 0x00ff00 })
 );
+cube.position.set(0, 1.6, 0);
 scene.add(cube);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -34,22 +47,15 @@ scene.add(light);
 scene.add(new THREE.GridHelper(50, 50));
 
 const controls = new PointerLockControls(camera, document.body);
-
-document.body.addEventListener('click', () => {
-  controls.lock();
-});
+document.body.addEventListener('click', () => controls.lock());
 
 const keys = {};
-document.addEventListener('keydown', (e) => {
-  keys[e.code] = true;
-});
-document.addEventListener('keyup', (e) => {
-  keys[e.code] = false;
-});
+document.addEventListener('keydown', (e) => (keys[e.code] = true));
+document.addEventListener('keyup',   (e) => (keys[e.code] = false));
 
 const speed = 0.1;
-
 function handleMovement() {
+  if (!controls.isLocked) return; 
   if (keys['KeyW']) controls.moveForward(speed);
   if (keys['KeyS']) controls.moveForward(-speed);
   if (keys['KeyA']) controls.moveRight(-speed);
@@ -67,7 +73,6 @@ function animate() {
   cube.rotation.y += 0.01;
 
   handleMovement();
-
   renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
