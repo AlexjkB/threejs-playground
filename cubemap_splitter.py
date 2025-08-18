@@ -14,13 +14,13 @@ def split_and_save(img: Image.Image, start_x: int, start_y: int, size: int, out_
         cropped.save(out_path)
         print(f"✓ Saved {out_path}")
     except Exception as e:
-        print(f"* ERROR: Could not save {out_path}: {e}")
+        print(f"ERROR: Could not save {out_path}: {e}")
 
 def process_image(file_path: Path) -> None:
     try:
         img = Image.open(file_path)
     except Exception as e:
-        print(f"* ERROR: Could not open {file_path}: {e}")
+        print(f"ERROR: Could not open {file_path}: {e}")
         return
 
     tile = img.size[0] // 4 
