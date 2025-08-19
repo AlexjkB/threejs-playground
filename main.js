@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const canvas = document.querySelector('#c');
 
@@ -27,6 +28,9 @@ scene.add(light);
 const ambientLight = new THREE.AmbientLight(0x404040, 5);
 scene.add(ambientLight);
 
+scene.add(new THREE.AxesHelper(2));
+
+
 const cubeLoader = new THREE.CubeTextureLoader();
 const skybox = cubeLoader.load(
     [
@@ -51,6 +55,7 @@ scene.add(cube);
 
 scene.add(new THREE.GridHelper(50, 50));
 
+/*
 const mtlLoader = new MTLLoader();
 mtlLoader.load('resources/objects/audioobj.mtl', (mtl) => {
 
@@ -64,6 +69,16 @@ mtlLoader.load('resources/objects/audioobj.mtl', (mtl) => {
     });
 
 });
+*/
+
+const loader = new GLTFLoader();
+loader.setPath('resources/objects/');
+loader.load(
+  'itfigurine_v3.gltf',
+  (gltf) => scene.add(gltf.scene),
+  undefined,
+  (err) => console.error('GLTF load error:', err)
+);
 
 const controls = new PointerLockControls(camera, document.body);
 document.body.addEventListener('click', () => controls.lock());
